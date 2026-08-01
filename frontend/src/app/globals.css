@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --deep-blue: #0f172a;
+  --saffron: #f97316;
+  --emerald: #10b981;
+  --golden: #fbbf24;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Keeps anchor-linked sections from landing underneath the floating nav island. */
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background-color: #f8fafc;
+  color: #111827;
+}
+
+/* Visible keyboard focus everywhere -- never remove outline without replacing it. */
+:focus-visible {
+  outline: 3px solid var(--golden);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Continuous filmstrip scroll for the "train window" gallery on the Journey section. */
+@keyframes train-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.train-strip-track {
+  animation: train-scroll 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .train-strip-track {
+    animation: none;
+  }
+}
+
+/* Front-facing tram marker on the Journey timeline: headlights pulse gently
+   so it reads as running toward/away from the viewer as it moves down the
+   vertical track, and a light chug/bob sells the motion. */
+@keyframes headlight-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.svg-headlight {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: headlight-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes chug {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.train-chug {
+  animation: chug 0.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-headlight,
+  .train-chug {
+    animation: none;
+  }
+}

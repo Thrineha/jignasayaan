@@ -1,0 +1,88 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal
+    # No `ports:` mapping -- Postgres is reachable only from other
+    # containers on the internal network, never from the host/internet.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      API_PORT: ${API_PORT}
+      # Built from the same POSTGRES_* values the postgres service uses --
+      # never set independently, or the two can drift out of sync.
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+    # Not published to the host -- only nginx (and other containers on
+    # `internal`) can reach it, via the service name `backend`.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      # Used only in server components/RSC (no browser) to reach the backend
+      # directly over the internal Docker network by service name.
+      INTERNAL_API_BASE_URL: http://backend:${API_PORT}/api
+    depends_on:
+      - backend
+    networks:
+      - internal
+    security_opt:
+      - no-new-privileges:true
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT}:80"
+      # - "${NGINX_SSL_PORT}:443"   # enable once certs are mounted, see nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - internal
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - ./certs:/etc/nginx/certs:ro   # mount real TLS certs here for HTTPS
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  pgdata:

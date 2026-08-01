@@ -1,0 +1,70 @@
+<svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#F0F9FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="250" fill="url(#sky2)"/>
+  <path d="M0 140 L80 60 L150 130 L220 50 L300 130 L400 70 V250 H0 Z" fill="#64748B" opacity="0.45"/>
+  <path d="M0 170 L100 100 L180 160 L260 90 L340 160 L400 120 V250 H0 Z" fill="#475569" opacity="0.7"/>
+  <ellipse cx="100" cy="90" rx="55" ry="12" fill="#F8FAFC" opacity="0.55"/>
+  <ellipse cx="280" cy="70" rx="65" ry="14" fill="#F8FAFC" opacity="0.45"/>
+
+  <!-- hillside embankment the track runs along -->
+  <path d="M0 210 L400 210 V250 H0 Z" fill="#0F172A"/>
+  <path d="M0 205 Q100 198 200 206 T400 202" stroke="#78350F" stroke-width="4" fill="none" opacity="0.7"/>
+  <g stroke="#78350F" stroke-width="2" opacity="0.5">
+    <line x1="20" y1="212" x2="20" y2="220"/>
+    <line x1="55" y1="211" x2="55" y2="219"/>
+    <line x1="90" y1="211" x2="90" y2="219"/>
+    <line x1="125" y1="212" x2="125" y2="220"/>
+    <line x1="160" y1="212" x2="160" y2="220"/>
+    <line x1="195" y1="211" x2="195" y2="219"/>
+    <line x1="230" y1="211" x2="230" y2="219"/>
+    <line x1="265" y1="212" x2="265" y2="220"/>
+  </g>
+
+  <g stroke="#F8FAFC" stroke-width="2.5" opacity="0.6" stroke-linecap="round">
+    <line x1="8" y1="165" x2="52" y2="165"/>
+    <line x1="2" y1="177" x2="58" y2="177"/>
+    <line x1="12" y1="189" x2="48" y2="189"/>
+  </g>
+
+  <g>
+    <rect x="58" y="165" width="80" height="40" rx="7" fill="#0F172A"/>
+    <rect x="68" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="92" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="116" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="58" y="198" width="80" height="5" fill="#F97316"/>
+  </g>
+
+  <g>
+    <rect x="146" y="165" width="80" height="40" rx="7" fill="#0F172A"/>
+    <rect x="156" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="180" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="204" y="174" width="15" height="13" rx="2" fill="#BAE6FD"/>
+    <rect x="146" y="198" width="80" height="5" fill="#F97316"/>
+  </g>
+
+  <g>
+    <rect x="234" y="155" width="86" height="50" rx="10" fill="#0F172A"/>
+    <path d="M320 160 Q337 165 337 182 Q337 199 320 200 Z" fill="#0F172A"/>
+    <rect x="246" y="164" width="25" height="17" rx="2" fill="#BAE6FD"/>
+    <rect x="277" y="164" width="19" height="17" rx="2" fill="#BAE6FD"/>
+    <rect x="234" y="197" width="103" height="6" fill="#F97316"/>
+    <rect x="261" y="128" width="12" height="27" rx="2" fill="#0F172A"/>
+    <circle cx="267" cy="120" r="7" fill="#CBD5E1" opacity="0.8"/>
+    <circle cx="258" cy="110" r="9" fill="#E2E8F0" opacity="0.6"/>
+    <circle cx="272" cy="100" r="10" fill="#F1F5F9" opacity="0.45"/>
+  </g>
+
+  <g fill="#111827">
+    <circle cx="76" cy="209" r="9"/>
+    <circle cx="118" cy="209" r="9"/>
+    <circle cx="164" cy="209" r="9"/>
+    <circle cx="206" cy="209" r="9"/>
+    <circle cx="256" cy="209" r="10"/>
+    <circle cx="300" cy="209" r="10"/>
+  </g>
+</svg>
