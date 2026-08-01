@@ -45,7 +45,7 @@ export const corsMiddleware = cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   maxAge: 600,
 });
