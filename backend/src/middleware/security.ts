@@ -4,94 +4,127 @@ import rateLimit from "express-rate-limit";
 import type { RequestHandler, ErrorRequestHandler } from "express";
 
 /**
- * Helmet: secure headers on every response. CSP is intentionally strict --
- * tighten `script-src`/`style-src` further with nonces once the frontend's
- * exact asset origins are finalized.
+ * Helmet: secure headers on every response.
+ * CSP is kept compatible with common frontend frameworks.
  */
 export const secureHeaders: RequestHandler = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Next.js injects critical CSS inline
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https:"],
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
-      upgradeInsecureRequests: [],
+      upgradeInsecureRequests:
+        process.env.NODE_ENV === "production" ? [] : null,
     },
   },
-  crossOriginResourcePolicy: { policy: "same-site" },
-  hsts: { maxAge: 63072000, includeSubDomains: true, preload: true },
+
+  crossOriginResourcePolicy: {
+    policy: "cross-origin",
+  },
+
+  hsts: {
+    maxAge: 63072000,
+    includeSubDomains: true,
+    preload: true,
+  },
 });
 
 /**
- * CORS: explicit allow-list from env, never a wildcard. Requests with no
- * Origin header (server-to-server, curl) are allowed through since they
- * aren't subject to browser same-origin protections anyway.
+ * CORS: allow all origins.
+ *
+ * NOTE:
+ * credentials MUST be false when using "*".
  */
-const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "https://jignasayaan-psi.vercel.app/,https://jignasayaan-psi.vercel.app,*")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
 export const corsMiddleware = cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: "*",
+  credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
   maxAge: 600,
 });
 
-/** General read-endpoint limiter. */
+/**
+ * General API rate limiter.
+ */
 export const generalLimiter = rateLimit({
   windowMs: 60_000,
   limit: 120,
   standardHeaders: true,
   legacyHeaders: false,
+  message: {
+    error: "Too many requests. Please try again later.",
+  },
 });
 
-/** Tighter limiter for write endpoints (registration submissions). */
+/**
+ * Write endpoint limiter.
+ */
 export const writeLimiter = rateLimit({
   windowMs: 60_000,
   limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: "Too many requests. Please try again in a minute." },
+  message: {
+    error: "Too many requests. Please try again in a minute.",
+  },
 });
 
 /**
- * Strict limiter for login attempts -- brute-force/credential-stuffing
- * defense. Keyed on IP; pair with account lockout at the application layer
- * for production (not implemented here).
+ * Login brute-force protection.
  */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60_000,
   limit: 8,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: "Too many login attempts. Please try again later." },
+  message: {
+    error: "Too many login attempts. Please try again later.",
+  },
 });
 
 /**
- * Centralized error handler. Never leak stack traces or internal error
- * detail to the client -- log full detail server-side only.
+ * Central error handler.
  */
-export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
-  // eslint-disable-next-line no-console
-  console.error({ path: req.path, method: req.method, err }, "Unhandled error");
+export const errorHandler: ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  _next
+) => {
+  console.error(
+    {
+      path: req.path,
+      method: req.method,
+      err,
+    },
+    "Unhandled error"
+  );
 
-  if (res.headersSent) return;
+  if (res.headersSent) {
+    return;
+  }
 
-  const status = typeof err?.status === "number" ? err.status : 500;
+  const status =
+    typeof err?.status === "number"
+      ? err.status
+      : 500;
+
+  const safeMessages: Record<number, string> = {
+    400: "Bad request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not found",
+    429: "Too many requests",
+  };
+
   res.status(status).json({
-    error: status === 500 ? "Internal server error" : err.message ?? "Request failed",
+    error:
+      safeMessages[status] ??
+      "Internal server error",
   });
 };
