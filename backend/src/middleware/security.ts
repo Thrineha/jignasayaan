@@ -32,7 +32,7 @@ export const secureHeaders: RequestHandler = helmet({
  * Origin header (server-to-server, curl) are allowed through since they
  * aren't subject to browser same-origin protections anyway.
  */
-const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
+const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "https://jignasayaan-psi.vercel.app/,https://jignasayaan-psi.vercel.app,*")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);

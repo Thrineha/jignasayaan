@@ -4,7 +4,8 @@
 //   absolute URL -- we reach the backend directly over the internal
 //   Docker network via its service name.
 const CLIENT_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
-const SERVER_API_BASE = process.env.INTERNAL_API_BASE_URL ?? "http://backend:4000/api";
+const SERVER_API_BASE = process.env.INTERNAL_API_BASE_URL ?? "https://jignasayaan.onrender.com/api";
+//  "http://backend:4000/api";
 
 function apiBase(): string {
   return typeof window === "undefined" ? SERVER_API_BASE : CLIENT_API_BASE;
